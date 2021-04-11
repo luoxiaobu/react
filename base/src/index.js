@@ -1,17 +1,33 @@
+// 核心库 预渲染平台无关 将模板变成 一个对象 vdom {props,type,ref}
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+//渲染库 可以把react渲染到不同平台上 react-dom react-native react-canvas
+import ReactDom from 'react-dom';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+
+class Counter extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { number: 0 };
+    }
+    // fiels class
+    handleClick = (event) => {
+        // 在当前批处理下 this.state.number 是不会改变的
+        // event.stopPropagation()
+        console.log(event)
+        this.setState({number:this.state.number + 1})
+        console.log(this.state.number)
+        this.setState({number:this.state.number + 1})
+        console.log(this.state.number)
+    }
+
+    render() {
+        return(<div onClick={()=>{alert(1)}}>
+            <h1 style={{color:'#ccc'}}>xiaobu test</h1>
+            <div>{this.state.number}</div>
+            <div><button onClick={this.handleClick}>点击一下</button></div>
+        </div>)
+    }
+}
+
+ReactDom.render(<Counter/>,document.getElementById('root'))
