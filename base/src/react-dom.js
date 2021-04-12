@@ -14,7 +14,7 @@ function render(vdom, parentDom) {
  * @param {*} vdom
  * @returns 返回一个真实的 dom
  */
-function createDom(vdom) {
+export function createDom(vdom) {
     if (typeof vdom === 'string' || typeof vdom == 'number') {
         return document.createTextNode(vdom)
     }
@@ -54,8 +54,11 @@ function updateClassComponent(type, props) {
     // 创建一个实例
     let classInstance = new type(props);
     // 执行render 方法
-    let vdom = classInstance.render()
-    return createDom(vdom)
+    let vdom = classInstance.render();
+    let dom = createDom(vdom);
+    // 组件实例上保存了真实dom的引用
+    classInstance.dom = dom;
+    return dom;
 }
 /**
  *

@@ -1,4 +1,4 @@
-// import { updateQueue } from './Component';
+import { updateQueue } from './component';
 /**
  *绑定事件委托到document上
  *
@@ -38,7 +38,10 @@ function dispatchEvent(event) {
         for (let key in event) {
             syntheticEvent[key] = event[key]
         }
-        listener.call(target, syntheticEvent)
+        updateQueue.isBatchingUpdate = true;
+        listener.call(target, syntheticEvent);
+        // updateQueue.isBatchingUpdate = false;
+        updateQueue.batchUpdate()
         for (let key in event) {
             syntheticEvent[key] = null;
         }

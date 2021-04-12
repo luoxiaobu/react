@@ -8,7 +8,7 @@ import ReactDom from 'react-dom';
 class Counter extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { number: 0 };
+        this.state = { number: 0, name: 'haha' };
     }
     // fiels class
     handleClick = (event) => {
@@ -17,12 +17,19 @@ class Counter extends React.Component {
         console.log(event)
         this.setState({number:this.state.number + 1})
         console.log(this.state.number)
-        this.setState({number:this.state.number + 1})
+        this.setState({number:this.state.number + 1, name: 'xiaoyi'})
         console.log(this.state.number)
+        this.setState((prestate)=>({number: prestate.number + 1}))
+        this.setState((prestate)=>({number: prestate.number + 1}))
+        this.setState((prestate)=>({number: prestate.number + 1}))
+        this.setState((prestate)=>({number: prestate.number + 1}))
+        this.setState({number:this.state.number + 1})
+        this.setState((prestate)=>({number: prestate.number + 1}))
+        setTimeout(()=>{console.log(this.state)})
     }
 
     render() {
-        return(<div onClick={()=>{alert(1)}}>
+        return(<div>
             <h1 style={{color:'#ccc'}}>xiaobu test</h1>
             <div>{this.state.number}</div>
             <div><button onClick={this.handleClick}>点击一下</button></div>
