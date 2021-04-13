@@ -1,4 +1,5 @@
 import Component from './component'
+// import { REACT_FORWARD_TYPE } from './const'
 /**
  * 
  * @param {string} type 元素 类型
@@ -8,8 +9,11 @@ import Component from './component'
  * return  返回一个react 元素 object 对象
  */
 function createElement(type, config, children) {
+    let ref;
     if (config) {
         delete config.__source;
+        // 用处？？？
+        // ref = config.ref;
     }
     let props = {...config }
         // 此处可能是数组
@@ -21,13 +25,30 @@ function createElement(type, config, children) {
 
     return {
         props,
-        type
+        type,
+        ref
     }
 }
 
+function createRef() {
+    return {
+        current: null
+    }
+}
+
+// // 获取传递给它的 ref，然后转发到它渲染的Dom上
+// function forwardRef(FunctionComponent) {
+//     //包装 FunctionComponent 是一个函数
+//     return {
+//         type: REACT_FORWARD_TYPE,
+//         render: FunctionComponent
+//     }
+// }
+
 export default {
     createElement,
-    Component
+    Component,
+    createRef
 }
 
 /**

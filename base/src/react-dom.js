@@ -19,14 +19,14 @@ export function createDom(vdom) {
         return document.createTextNode(vdom)
     }
 
-    let { type, props } = vdom;
+    let { type, props, ref } = vdom;
     let dom;
     if (typeof type === 'function') {
-        return type.prototype.isReactComponent ? updateClassComponent(type, props) : updateFunctionComponent(type, props);
+        return type.prototype.isReactComponent ? updateClassComponent(vdom) : updateFunctionComponent(vdom);
     } else {
         dom = document.createElement(type);
     }
-
+    // 此处是对普通节点的处理
     updateProps(dom, props);
     // 处理子元素
     if (typeof props.children === 'string' || typeof props.children == 'number') {
@@ -35,6 +35,12 @@ export function createDom(vdom) {
         render(props.children, dom);
     } else if (Array.isArray(props.children)) {
         reconcilChildren(props.children, dom)
+    } else { // 兜底？？？？？
+        dom.textContent = props.children ? props.children.toString() : '';
+    }
+    // 普通节点的ref
+    if (ref) {
+        ref.current = dom
     }
     return dom
 }
@@ -45,21 +51,35 @@ export function createDom(vdom) {
  * @param {*} props
  * @returns
  */
-function updateFunctionComponent(type, props) {
+function updateFunctionComponent(functionComponent) {
+    let { type, props } = functionComponent;
     let vdom = type(props)
     return createDom(vdom)
 }
 
-function updateClassComponent(type, props) {
+function updateClassComponent(classComponent) {
+    let { type, props, ref } = classComponent;
     // 创建一个实例
     let classInstance = new type(props);
-    // 执行render 方法
+    // 执行render 方法 
     let vdom = classInstance.render();
     let dom = createDom(vdom);
     // 组件实例上保存了真实dom的引用
     classInstance.dom = dom;
+    if (ref) {
+        ref.current = classInstance
+    }
     return dom;
 }
+
+// ForWardComponent 实现主要是一个 ref 的传递
+function updateForWardComponent(functionComponent) {
+    let { type, props, ref } = functionComponent;
+    let vdom = type.render(props, type);
+    let dom = createDom(vdom);
+    return dom;
+}
+
 /**
  *
  *
