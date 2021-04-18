@@ -61,7 +61,18 @@ function updateClassComponent(classComponent) {
     let { type, props, ref } = classComponent;
     // 创建一个实例
     let classInstance = new type(props);
-    // 执行render 方法 
+
+    classInstance.componentWillMount && classInstance.componentWillMount();
+
+    // 组件第一次挂载时
+    if (type.getDerivedStateFromProps) {
+        let newState = type.getDerivedStateFromProps(classInstance.props, classInstance.state)
+        if (newState) {
+            classInstance.state = {...classInstance.state, ...newState };
+        }
+    }
+
+    // 执行render 方法
     let vdom = classInstance.render();
     let dom = createDom(vdom);
     // 组件实例上保存了真实dom的引用
@@ -69,16 +80,18 @@ function updateClassComponent(classComponent) {
     if (ref) {
         ref.current = classInstance
     }
+    //此函数应该在组件挂在后立即调用此处暂时？？？？
+    classInstance.componentDidMount && classInstance.componentDidMount();
     return dom;
 }
 
-// ForWardComponent 实现主要是一个 ref 的传递
-function updateForWardComponent(functionComponent) {
-    let { type, props, ref } = functionComponent;
-    let vdom = type.render(props, type);
-    let dom = createDom(vdom);
-    return dom;
-}
+// // ForWardComponent 实现主要是一个 ref 的传递
+// function updateForWardComponent(functionComponent) {
+//     let { type, props, ref } = functionComponent;
+//     let vdom = type.render(props, type);
+//     let dom = createDom(vdom);
+//     return dom;
+// }
 
 /**
  *
@@ -104,7 +117,6 @@ function updateProps(dom, props) {
         // dom[key] = props[key]
     }
 }
-
 
 function reconcilChildren(children, dom) {
     children.forEach(child => {

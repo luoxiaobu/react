@@ -9,7 +9,6 @@ import { updateQueue } from './component';
  */
 export function addEvent(dom, eventType, listener) {
     // 将事件存储到dom 元素上的一个对象上
-    console.log('addEvent')
     let store = dom.store || (dom.store = {});
     store[eventType] = listener;
     //document.addEventListener(type,listener,是否冒泡阶段捕获)
