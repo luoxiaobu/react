@@ -37,18 +37,26 @@ function createRef() {
 }
 
 // // 获取传递给它的 ref，然后转发到它渲染的Dom上
-// function forwardRef(FunctionComponent) {
-//     //包装 FunctionComponent 是一个函数
-//     return {
-//         type: REACT_FORWARD_TYPE,
-//         render: FunctionComponent
-//     }
-// }
+function forwardRef(FunctionComponent) {
+    // return class extends Component {
+    //     render() {
+    //         console.log(arguments)
+    //         return FunctionComponent(...arguments)
+    //     }
+    // }
+    // 从源码的输出看 此处应该返回一个带render 函数的对象
+    //包装 FunctionComponent 是一个函数
+    return {
+        type: REACT_FORWARD_TYPE,
+        render: FunctionComponent
+    }
+}
 
 export default {
     createElement,
     Component,
-    createRef
+    createRef,
+    forwardRef
 }
 
 /**
