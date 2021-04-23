@@ -122,6 +122,7 @@ class Component {
         let snapshot = this.getSnapshotBeforeUpdate && this.getSnapshotBeforeUpdate()
         let newDom = createDom(newVdom)
         let oldDom = this.dom;
+        // 此处常规下应该做dom diff
         oldDom.parentNode.replaceChild(newDom, oldDom);
         this.componentDidUpdate && this.componentDidUpdate(this.props, this.state, snapshot);
         this.dom = newDom;
