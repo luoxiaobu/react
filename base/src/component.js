@@ -61,7 +61,6 @@ class Updater {
     // 让组件进行更新
     updateComponent() {
         let { classInstance, pendingState, nextProps } = this;
-        let { state } = classInstance;
         if (nextProps || pendingState.length > 0) {
             // 每次更新时
             shouldUpdate(classInstance, nextProps, this.getState());
@@ -92,7 +91,7 @@ function shouldUpdate(classInstance, nextProps, nextState) {
     // 数据变了不一定更新
     classInstance.state = nextState || classInstance.state;
     classInstance.props = nextProps || classInstance.props;
-    if (classInstance && !classInstance.shouldComponentUpdate(nextProps, nextState)) {
+    if (classInstance && classInstance.shouldComponentUpdate && !classInstance.shouldComponentUpdate(nextProps, nextState)) {
         return
     }
     classInstance.forceUpdate();
@@ -121,11 +120,15 @@ class Component {
 
         let snapshot = this.getSnapshotBeforeUpdate && this.getSnapshotBeforeUpdate()
         let newDom = createDom(newVdom)
-        let oldDom = this.dom;
-        // 此处常规下应该做dom diff
-        oldDom.parentNode.replaceChild(newDom, oldDom);
+            // 此处常规下应该做dom diff
+        this.parentNode.replaceChildren(newDom);
         this.componentDidUpdate && this.componentDidUpdate(this.props, this.state, snapshot);
-        this.dom = newDom;
+        // 组件实例上保存了真实dom的引用
+        if (newDom.nodeType === 11) {
+            this.dom = {...newDom.children };
+        } else {
+            this.dom = newDom;
+        }
 
     }
 }

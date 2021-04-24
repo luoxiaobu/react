@@ -5,8 +5,16 @@ import { addEvent } from './event';
  * @param {*} parentDom
  */
 function render(vdom, parentDom) {
-    let dom = createDom(vdom);
-    parentDom.appendChild(dom)
+    let domOrdomObject = createDom(vdom);
+    if (domOrdomObject && domOrdomObject.classInstance) {
+        let { dom, classInstance } = domOrdomObject;
+        classInstance.componentDidMount && classInstance.componentDidMount();
+        classInstance.parentNode = parentDom
+        parentDom.appendChild(dom)
+    } else {
+        parentDom.appendChild(domOrdomObject)
+    }
+
 }
 /**
  *
@@ -21,14 +29,23 @@ export function createDom(vdom) {
 
     let { type, props, ref } = vdom;
     let dom;
-    if (typeof type === 'function') {
+    if (typeof type === 'object' && type != null) {
+        if (type.render) {
+            return updateForWardComponent(vdom)
+        } else if (type._context) { // react 走的分支
+            type._context._value = props.value
+            dom = document.createDocumentFragment();
+        } else if (type.type === 'REACT_CONTEXT_TYPE') {
+            return updateConsumer(vdom)
+        }
+    } else if (typeof type === 'function') {
         return type.prototype.isReactComponent ? updateClassComponent(vdom) : updateFunctionComponent(vdom);
     } else {
+        // 此处是对普通节点的处理
         dom = document.createElement(type);
+        updateProps(dom, props);
     }
-    // 此处是对普通节点的处理
-    updateProps(dom, props);
-    // 处理子元素
+
     if (typeof props.children === 'string' || typeof props.children == 'number') {
         dom.textContent = props.children;
     } else if (typeof props.children === 'object' && !Array.isArray(props.children)) {
@@ -44,7 +61,15 @@ export function createDom(vdom) {
     }
     return dom
 }
+
+function updateConsumer(ConsumerVdom) {
+    let { type, props } = ConsumerVdom;
+    let vdom = props.children(type._value)
+    return createDom(vdom)
+}
+
 /**
+ * 
  *将函数组件转换成dom
  *
  * @param {*} type
@@ -72,26 +97,33 @@ function updateClassComponent(classComponent) {
         }
     }
 
+    // 在执行render 方法前 给实例对象赋值
+    if (type.contextType) {
+        classInstance.context = type.contextType._value
+    }
+
     // 执行render 方法
     let vdom = classInstance.render();
     let dom = createDom(vdom);
     // 组件实例上保存了真实dom的引用
-    classInstance.dom = dom;
+    if (dom.nodeType === 11) {
+        classInstance.dom = {...dom.children };
+    } else {
+        classInstance.dom = dom;
+    }
     if (ref) {
         ref.current = classInstance
     }
-    //此函数应该在组件挂在后立即调用此处暂时？？？？
-    classInstance.componentDidMount && classInstance.componentDidMount();
-    return dom;
+    return { dom, classInstance };
 }
 
 // // ForWardComponent 实现主要是一个 ref 的传递
-// function updateForWardComponent(functionComponent) {
-//     let { type, props, ref } = functionComponent;
-//     let vdom = type.render(props, type);
-//     let dom = createDom(vdom);
-//     return dom;
-// }
+function updateForWardComponent(functionComponent) {
+    let { type, props, ref } = functionComponent;
+    let vdom = type.render(props, ref);
+    let dom = createDom(vdom);
+    return dom;
+}
 
 /**
  *
@@ -120,6 +152,9 @@ function updateProps(dom, props) {
 
 function reconcilChildren(children, dom) {
     children.forEach(child => {
+        if (Array.isArray(child)) {
+            return reconcilChildren(child, dom)
+        }
         render(child, dom)
     });
 }

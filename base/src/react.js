@@ -23,6 +23,7 @@ function createElement(type, config, children) {
     // 此处可能是对象或者字符串
     props.children = children
 
+    // 此处可对type 做一下统一规范
     return {
         props,
         type,
@@ -37,26 +38,60 @@ function createRef() {
 }
 
 // // 获取传递给它的 ref，然后转发到它渲染的Dom上
-function forwardRef(FunctionComponent) {
+function forwardRef(render) {
     // return class extends Component {
     //     render() {
     //         console.log(arguments)
     //         return FunctionComponent(...arguments)
     //     }
     // }
-    // 从源码的输出看 此处应该返回一个带render 函数的对象
-    //包装 FunctionComponent 是一个函数
+    //在createDom 的时候调用 render 传入 props 和 ref
     return {
-        type: REACT_FORWARD_TYPE,
-        render: FunctionComponent
+        type: 'REACT_FORWARD_REF_TYPE',
+        render
     }
 }
+
+function createContext() {
+    // 这是提供给函数组件用的
+    // function Consumer(props) {
+    //     return props.children(Provider._value)
+    // }
+
+    // function Provider(props) {
+    //     Provider._value = props.value
+    //     return props.children
+    // }
+    // return {
+    //     Consumer,
+    //     Provider
+    // }
+    // 类似于构建了一个闭包存储值
+    const context = {
+        type: 'REACT_CONTEXT_TYPE',
+        Provider: null,
+        Consumer: null,
+        _value: null
+    };
+
+    //这一整个对象值都是type方便处理，常规下一个是一个string 后期代码做处理。此处只是模仿结构 
+    // 用来保存值
+    context.Provider = {
+        type: 'REACT_PROVIDER_TYPE',
+        _context: context
+    };
+    //
+    context.Consumer = context;
+    return context
+}
+
 
 export default {
     createElement,
     Component,
     createRef,
-    forwardRef
+    forwardRef,
+    createContext
 }
 
 /**
