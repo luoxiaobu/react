@@ -30,6 +30,7 @@ export function createDom(vdom) {
     let { type, props, ref } = vdom;
     let dom;
     if (typeof type === 'object' && type != null) {
+        // 此处应该以type的值来区分
         if (type.render) {
             return updateForWardComponent(vdom)
         } else if (type._context) { // react 走的分支

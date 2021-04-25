@@ -1,7 +1,7 @@
 // 关于 ref ， React.createRef(),React.forwardRef()
 
 
-//类组件的ref 挂在的是组件的实例，可以调用实例上的方法
+//类组件的ref 挂载的是组件的实例，可以调用实例上的方法
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -31,6 +31,7 @@ class Form extends React.Component {
     }
 
     componentDidMount() {
+        //类组件的ref 挂载的是组件的实例，可以调用实例上的方法
         this.firstInput.current.getFocus()
     }
 

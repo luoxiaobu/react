@@ -5,18 +5,19 @@ import React from 'react'
 import ReactDom from 'react-dom'
 
 // let element2 = <h1 title="123" className="title"><span>xiaobu</span>hello<span>world</span ></h1>
-// // JXS 需要babel的转义 转移成createElement
+// // JXS 需要babel的转义 转移成createElement 片段
 // let element = React.createElement("h1", {
-//     title: "123"
+//     title: "123",
+//     className: 'title'
 // }, React.createElement("span", null, "xiaobu"), " hello ", React.createElement("span", null, " world"))
 // console.log(element2)
+
+
 // let names = ['王力宏', '迪丽热巴','景甜']
 // let template = <ul>{names.map((item)=><li>{item}</li>
 // )}</ul>
 
 // ReactDom.render(template, document.getElementById('root'))
-
-
 
 
 //函数式组件
@@ -73,7 +74,3 @@ import ReactDom from 'react-dom'
 
 
 // ReactDom.render(<Panel/>,document.getElementById('root'))
-
-
-
-// 纯函数
