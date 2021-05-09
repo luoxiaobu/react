@@ -1,3 +1,4 @@
+Hook 是一些可以让你在函数组件里“钩入” React state 及生命周期等特性的函数
 关于hook 源码：
 
 // useState

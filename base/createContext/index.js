@@ -10,7 +10,16 @@ let ThemeContext = React.createContext();
 
 const LIGHT = 'light'
 const DARK = 'dark'
-
+const themes = {
+    [LIGHT]: {
+        background: '#eeeeee',
+        changeColor: this.changeColor
+    },
+    [DARK]: {
+        background: '#222222',
+        changeColor: this.changeColor
+    },
+};
 // ThemeContent = {Provider, Consumer}
 
 //函数组件
@@ -98,16 +107,6 @@ class APP extends React.Component {
         console.log(this.a)
     }
     render() {
-        const themes = {
-            [LIGHT]: {
-                background: '#eeeeee',
-                changeColor: this.changeColor
-            },
-            [DARK]: {
-                background: '#222222',
-                changeColor: this.changeColor
-            },
-        };
         return (<ThemeContext.Provider value={themes[this.state.value]}>
             <Header menu={this.menu}></Header>
             <Main></Main>
