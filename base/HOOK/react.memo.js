@@ -43,7 +43,7 @@ function Item(props) {
 // useCallback, useMemo  
 /**
  * React.memo 一个函数组件 属性不变就跳过渲染复用
- * useCallback 减少函数创建的次数
+ * useCallback 把内联回调函数及依赖项数组作为参数传入 useCallback，它将返回该回调函数的 memoized 版本，该回调函数仅在某个依赖项改变时才会更新。
  * useMemo 减少对象创建的次数
  */
 
