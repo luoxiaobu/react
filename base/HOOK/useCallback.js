@@ -31,10 +31,10 @@ let MemoItem = React.memo(Item)
 // useCallback 解决问题
 // useCallback 把内联回调函数及依赖项数组作为参数传入 useCallback，它将返回该回调函数的 memoized 版本，
 //该回调函数仅在某个依赖项改变时才会更新。
-let date = [{ name: '可乐', price: 5, id: 'pi-123', number: 2 }, { name: '雪碧', price: 10, id: 'pi-124', number: 3 }]
-function count(date) {
+let data = [{ name: '可乐', price: 5, id: 'pi-123', number: 2 }, { name: '雪碧', price: 10, id: 'pi-124', number: 3 }]
+function count(data) {
     var priceCount = 0
-    date.forEach((item) => {
+    data.forEach((item) => {
         priceCount = priceCount + item.price * item.number
     })
     return priceCount
@@ -43,19 +43,19 @@ function App() {
     console.log('App')
     let [name, setName] = React.useState('xiaobu');
     // count 函数只在初始化执行一次
-    let [price, setPrice] = React.useState(() => count(date))
+    let [price, setPrice] = React.useState(() => count(data))
     let countPrice = () => {
-        setPrice(count(date))
+        setPrice(count(data))
     }
     // let changNumber = (id) => {
-    //     let product = date.find((item => item.id === id))
+    //     let product = data.find((item => item.id === id))
     //     product.number = product.number + 1
     //     countPrice()
     // }
     //空数组，不依赖任何项
     //内联回调函数 子组件会用到
     let memoizedchangNumber = React.useCallback((id) => {
-        let product = date.find((item => item.id === id))
+        let product = data.find((item => item.id === id))
         product.number = product.number + 1
         countPrice()
     },[])
@@ -70,7 +70,7 @@ function App() {
                 <span style={{ flex: 1 }}>单价</span>
                 <span style={{ flex: 1 }}>数量</span>
             </div>
-            {date.map(item => { return <MemoItem key={item.id} {...item} changNumber={memoizedchangNumber}></MemoItem> })}
+            {data.map(item => { return <MemoItem key={item.id} {...item} changNumber={memoizedchangNumber}></MemoItem> })}
         </div>
     )
 }

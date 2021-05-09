@@ -22,7 +22,7 @@ function Item(props) {
 
 // 问题组件Button 并未修改 ，但函数组件Button依旧执行了
 
-// let date = [{name:'可乐', price: '5', id:'pi-123'},{name:'雪碧', price: '10',id:'pi-124'}]
+// let data = [{name:'可乐', price: '5', id:'pi-123'},{name:'雪碧', price: '10',id:'pi-124'}]
 // function App(){
 //     let [name,setName] = React.useState('xiaobu');
 //     return (
@@ -34,7 +34,7 @@ function Item(props) {
 //             <span style={{flex: 1}}>单价</span>
 //             <span style={{flex: 1}}>数量</span>
 //         </div>
-//         {date.map(item=>{ return <Item key= {item.id} {...item}></Item>})}
+//         {data.map(item=>{ return <Item key= {item.id} {...item}></Item>})}
 //       </div>
 //     )
 //   }
@@ -50,7 +50,7 @@ function Item(props) {
 // 一个函数组件 属性不变就跳过渲染复用
 let MemoItem = React.memo(Item)
 
-let date = [{ name: '可乐', price: '5', id: 'pi-123' }, { name: '雪碧', price: '10', id: 'pi-124' }]
+let data = [{ name: '可乐', price: '5', id: 'pi-123' }, { name: '雪碧', price: '10', id: 'pi-124' }]
 function App() {
     let [name, setName] = React.useState('xiaobu');
     return (
@@ -62,7 +62,7 @@ function App() {
                 <span style={{ flex: 1 }}>单价</span>
                 <span style={{ flex: 1 }}>数量</span>
             </div>
-            {date.map(item => { return <MemoItem key={item.id} {...item}></MemoItem> })}
+            {data.map(item => { return <MemoItem key={item.id} {...item}></MemoItem> })}
         </div>
     )
 }
