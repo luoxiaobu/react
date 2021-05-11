@@ -11,6 +11,7 @@ class Counter extends React.Component {
         this.state = { number: 0, name: 'haha' };
     }
     // fiels class
+    //// 批量更新处理完成过后才会对 this.state 进行赋值
     handleClick = (event) => {
         // 注意批处理更新， this.setState() 传递函数 和 对象的区别
         // 在当前批处理下 this.state.number 是不会改变的

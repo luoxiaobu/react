@@ -47,7 +47,7 @@ let MemoItem = React.memo(Item)
 function App() {
     console.log('App')
     let [name, setName] = React.useState('xiaobu');
-    // count 函数只在初始化执行一次
+    // React 会确保 dispatch 函数的标识是稳定的，并且不会在组件重新渲染时改变。
     let [price, dispatch] = React.useReducer(reducer, data, init)
 
     return (
@@ -70,7 +70,7 @@ ReactDom.render(<App />, document.getElementById('root'))
 //     console.log('App')
 //     hookIndex = 0
 //     let [name, setName] = useState('xiaobu');
-//     // count 函数只在初始化执行一次
+//     // React 会确保 dispatch 函数的标识是稳定的，并且不会在组件重新渲染时改变。
 //     let [price, dispatch] = useReducer(reducer, data, init)
 
 //     return (
