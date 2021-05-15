@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDom from 'react-dom';
 /**
  * useEffect
- * 赋值给 useEffect 的函数会在组件渲染到屏幕之后执行。
+ * 赋值给 useEffect 的函数会在组件渲染之后执行。
  * 你可以把 effect 看作从 React 的纯函数式世界通往命令式世界的逃生通道。
  */
 // 深入理解useEffect 的执行
@@ -57,7 +57,7 @@ function Detial(props) {
     // 返回的 ref 对象在组件的整个生命周期内保持不变。
     let usrData = React.useRef([]);
     let userName = React.useRef('');
-    // 赋值给 useEffect 的函数会在组件渲染到屏幕之后执行
+    // 赋值给 useEffect 的函数会在组件渲染之后执行
     React.useEffect(() => {
         console.log('useEffect');
         // 存在竞争状态

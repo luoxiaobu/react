@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDom from 'react-dom';
 /**
  * useEffect
- * 赋值给 useEffect 的函数会在组件渲染到屏幕之后执行。
+ * 赋值给 useEffect 的函数会在组件渲染之后执行。
  * 你可以把 effect 看作从 React 的纯函数式世界通往命令式世界的逃生通道。
  */
 
 function App() {
     console.log('App')
     let [count, setCount] = React.useState(0);
-    // 赋值给 useEffect 的函数会在组件渲染到屏幕之后执行。
+    // 赋值给 useEffect 的函数会在组件渲染之后执行。
     React.useEffect(() => {
         let num = 0
         let timer = setInterval(() => {
@@ -83,7 +83,7 @@ ReactDom.render(<Page />, document.getElementById('root'))
 // index.js:40 clearInterval22
 
 // 清除 effect的时机
-// 1.执行useEffect的回调函数前（组件渲染到屏幕之后执行）
+// 1.执行useEffect的回调函数前（组件渲染之后执行）
 // useEffect的执行需要保证所有组件useEffect的销毁函数都执行完后才能执行任意一个组件的useEffect的回调函数。
-// 2. 节点销毁 （组件渲染到屏幕之后执行）
+// 2. 节点销毁 （组件渲染之后执行）
 // 会执行所有销毁且有清除 effect 回调的函数
