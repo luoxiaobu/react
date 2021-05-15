@@ -19,6 +19,7 @@ function APP() {
     React.useEffect(() => {
         console.log('setInterval: 1')
         let timer = setInterval(() => {
+            console.log('setInterval:count')
             if(count>=2) {
                 clearInterval(timer)
                 return 
@@ -26,7 +27,7 @@ function APP() {
             setCount((count) => {
                 return count + 1;
             })
-        });
+        },1000);
         return () => {
             console.log('clearInterval 1')
             clearInterval(timer)
@@ -35,6 +36,7 @@ function APP() {
     React.useEffect(() => {
         console.log('setInterval: 2')
         let timer = setInterval(() => {
+            console.log('setInterval: count2 ')
             if(count2>=200) {
                 clearInterval(timer)
                 return
@@ -42,7 +44,7 @@ function APP() {
             setCount2((count2) => {
                 return count2 + 100;
             })
-        });
+        },1000);
         return () => {
             console.log('clearInterval: 2')
             clearInterval(timer)
@@ -59,39 +61,42 @@ ReactDom.render(<APP></APP>, document.getElementById('root'))
 
 // ----------------------------------------
 // index.js:18 count 0 count2: 0
-// index.js:52 render
+// index.js:54 render
 // index.js:20 setInterval: 1
-// index.js:36 setInterval: 2
+// index.js:37 setInterval: 2
+// index.js:22 setInterval:count
 // index.js:17 ----------------------------------------
 // index.js:18 count 1 count2: 0
-// index.js:52 render
-// index.js:31 clearInterval 1
-// index.js:47 clearInterval: 2
+// index.js:54 render
+// index.js:39 setInterval: count2 
+// index.js:32 clearInterval 1
+// index.js:49 clearInterval: 2
 // index.js:20 setInterval: 1
-// index.js:36 setInterval: 2
+// index.js:37 setInterval: 2
 // index.js:17 ----------------------------------------
 // index.js:18 count 1 count2: 100
-// index.js:52 render
-// index.js:31 clearInterval 1
-// index.js:47 clearInterval: 2
+// index.js:54 render
+// index.js:32 clearInterval 1
+// index.js:49 clearInterval: 2
 // index.js:20 setInterval: 1
-// index.js:36 setInterval: 2
+// index.js:37 setInterval: 2
+// index.js:22 setInterval:count
 // index.js:17 ----------------------------------------
 // index.js:18 count 2 count2: 100
-// index.js:52 render
-// index.js:31 clearInterval 1
-// index.js:47 clearInterval: 2
+// index.js:54 render
+// index.js:39 setInterval: count2 
+// index.js:32 clearInterval 1
+// index.js:49 clearInterval: 2
 // index.js:20 setInterval: 1
-// index.js:36 setInterval: 2
+// index.js:37 setInterval: 2
 // index.js:17 ----------------------------------------
 // index.js:18 count 2 count2: 200
-// index.js:52 render
-// index.js:31 clearInterval 1
-// index.js:47 clearInterval: 2
+// index.js:54 render
+// index.js:32 clearInterval 1
+// index.js:49 clearInterval: 2
 // index.js:20 setInterval: 1
-// index.js:36 setInterval: 2
+// index.js:37 setInterval: 2
+// index.js:22 setInterval:count
+// index.js:39 setInterval: count2 
 
-
-// 每一次的state变化都会触发一次 app函数的重新执行
-// 组件渲染，并不一定是页面渲染
-// 见 ./img/useEffect-render.png
+// 比较与useLaytEffect-render.js 比较结果图 ./img/ layoutEfect-and-effect.png 
