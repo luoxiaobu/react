@@ -16,7 +16,7 @@ class TextInput extends React.Component {
     }
 
     render() {
-        return ( <div div > { this.props.children } < input ref = { this.input }/></div> )
+        return ( <div> { this.props.children } < input ref = { this.input }/></div> )
     }
 }
 
@@ -36,8 +36,7 @@ class Form extends React.Component {
     }
 
     render() {
-        return ( <
-            div >
+        return ( <div >
             <TextInput ref = { this.firstInput } > 姓名: </TextInput> 
             <TextInput > 年龄: </TextInput> </div>
         )
