@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+    <div id="root"></div>
+    <a href="#/a">去/a</a>
+    <a href="#/b">去/b</a>
+    <script>
+        window.addEventListener('hashchange', (ev) => {
+            console.log(ev);
+            console.log(window.location.hash);
+            let pathname = window.location.hash.slice(1);
+            root.innerHTML = pathname;
+        })
+    </script>
+</body>
+
+</html>
+
+<!--
+    hashchange hash 变化时触发，
+    它暴露了很多有用的方法和属性，允许你在用户浏览历史中向前和向后跳转，
+    同时，从HTML5开始——提供了对history栈中内容的操作。
+-->

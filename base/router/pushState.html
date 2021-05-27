@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<style>
+    div {
+        width: 100px;
+        background-color: #ccc;
+    }
+</style>
+
+<body>
+    <script>
+        window.addEventListener('hashchange', (ev) => {
+            console.log('hashchange');
+            // pushState 并不会触发hashchange 即使hash 变化
+        })
+
+        window.onpopstate = function(event) {
+            //调用history.pushState()或者history.replaceState()不会触发popstate事件. 
+            // popstate事件只会在浏览器某些行为下触发, 
+            // 比如点击后退、前进按钮(或者在JavaScript中调用history.back()、history.forward()、history.go()方法)，此外，a 标签的锚点也会触发该事件.
+
+            // 浏览器行为
+            console.log('popstate， render');
+        };
+        window.onpushstate = function() {
+            // 代码修改的行为
+            console.log('onpushstate， render');
+        };
+
+        (function(history) {
+            let pushState = history.pushState;
+            history.pushState = function(state, title, pathname) {
+                let result = pushState.apply(history, arguments);
+                if (typeof window.onpushstate == 'function') {
+                    window.onpushstate();
+                }
+                return result;
+            }
+        })(window.history);
+
+        function goA() {
+            // 一个状态对象, 一个标题 (目前被忽略), 和 (可选的) 一个URL
+            console.log('goA');
+            history.pushState({
+                page: 1
+            }, 'goA', '?page=a')
+        }
+
+        function goB() {
+            console.log('goB');
+            // 一个状态对象, 一个标题 (目前被忽略), 和 (可选的) 一个URL
+            history.pushState({
+                page: 2
+            }, 'goB', '?page=b')
+        }
+    </script>
+    <div id="root"></div>
+    <div onclick="goA()">去/a</div>
+    <div onclick="goB()">去/b</div>
+</body>
+
+</html>
+
+<!--
+    hashchange hash 变化时触发，
+    它暴露了很多有用的方法和属性，允许你在用户浏览历史中向前和向后跳转，
+    同时，从HTML5开始——提供了对history栈中内容的操作。
+-->
