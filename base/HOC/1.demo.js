@@ -4,7 +4,9 @@ import React from 'react';
 // 渲染库 可以把react 渲染到不同平台上 react-dom react-canvas react-native
 import ReactDom from 'react-dom';
 // 高阶组件（HOC） 用于复用组件逻辑。
+
 // 高阶组件是参数为组件，返回值为新组件的函数。
+
 // 不要改变原始组件。使用组合。
 
 // 常用方法
