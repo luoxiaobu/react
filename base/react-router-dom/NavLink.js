@@ -1,1 +1,1 @@
-export default function Link(props) {}
+export default function NavLink(props) {}
