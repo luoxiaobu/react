@@ -3,6 +3,8 @@
  * 
  * "history": "^4.9.0",
  * https://github.com/ReactTraining/history/tree/v4.9.0/modules
+ *  
+ * 主要区分 popState 和 pushState 
  */
 
 
@@ -32,7 +34,6 @@
     replace: ƒ replace(path, state)
  */
 
-// 处理字符串的path
 export function parsePath(path) {
     let partialPath = {};
     if (path) {
@@ -78,7 +79,7 @@ export function createBrowserHistory(props) {
     }
 
     function getNextLocation(to, state = null) {
-        return Object.assign(Object.assign({}, location), (typeof to === 'string' ? parsePath(to) : to), { state });
+        return Object.assign({}, location, (typeof to === 'string' ? parsePath(to) : to), { state });
     }
 
     function getHistoryStateAndUrl(nextLocation, index) {
@@ -105,7 +106,7 @@ export function createBrowserHistory(props) {
         // 调用listener 去更新state 从而更新组件
         listeners.forEach(listener => listener(location, action));
     }
-    // 对 history 变化的响应，history.go back ......
+    // POP 造成 对 history 变化的响应，history.go back ......
     window.addEventListener('popstate', () => {
         let nextAction = 'POP'
         applyTx(nextAction);
@@ -189,6 +190,157 @@ export function createBrowserHistory(props) {
         push,
         replace,
         createHref
+    }
+
+    return history;
+}
+
+
+// 只是表达URl的形式不同，处理状态过程是相同的。
+export function createHashHistory(props) {
+
+    function getIndexAndLocation() {
+        let { pathname = '/', hash = '', search = '' } = parsePath(window.location.hash.substr(1))
+        let state = globalHistory.state || {};
+        return [state.idx, {
+            pathname,
+            search,
+            hash,
+        }]
+    }
+    // 当用户浏览会话历史时活动历史条目发生变化时，会触发 Window 界面的 popstate 事件。
+    // 当调用 history.pushState()或者history.replaceState()不会触发popstate事件. 
+    window.addEventListener('popstate', () => {
+        let nextAction = 'POP'
+        applyTx(nextAction);
+    });
+    // popstate does not fire on hashchange in IE 11 and old (trident) Edge
+    // https://developer.mozilla.org/de/docs/Web/API/Window/popstate_event
+
+    // 当popstate 在活动历史条目变化 有问题时
+    window.addEventListener('hashchange', () => {
+        let [, nextLocation] = getIndexAndLocation();
+        // Ignore extraneous hashchange events.
+        if (createPath(nextLocation) !== createPath(location)) {
+            let nextAction = 'POP'
+            applyTx(nextAction);
+        }
+    });
+
+    // window.history 上扩展包装
+    var globalHistory = window.history;
+    let listeners = [];
+    let action = 'POP';
+    let [index, location] = getIndexAndLocation();
+    // ???
+    function getBaseHref() {
+        let base = document.querySelector('base');
+        let href = '';
+        if (base && base.getAttribute('href')) {
+            let url = window.location.href;
+            let hashIndex = url.indexOf('#');
+            href = hashIndex === -1 ? url : url.slice(0, hashIndex);
+        }
+        return href;
+    }
+    // 生成URL
+    function createHref(to) {
+        return getBaseHref() + '#' + (typeof to === 'string' ? to : createPath(to));
+    }
+
+    function getNextLocation(to, state = null) {
+        return Object.assign({}, location, (typeof to === 'string' ? parsePath(to) : to), { state });
+    }
+
+    function getHistoryStateAndUrl(nextLocation, index) {
+        return [{
+                usr: nextLocation.state,
+                idx: index
+            },
+            createHref(nextLocation)
+        ];
+    }
+
+    // 确认是否离开路由
+    function allowTx(action, location, retry) {
+        return true
+    }
+    // 去到新的页面
+    function applyTx(nextAction) {
+        action = nextAction;
+        [index, location] = getIndexAndLocation();
+        // 调用listener 去更新state 从而更新组件
+        listeners.forEach(listener => listener(location, action));
+    }
+
+    function push(to, state) {
+        // 历史堆栈的管理 pathname: "", search: "", hash: "", state: "" 值 处理
+        // TODO: Support forced reloading
+        // iOS limits us to 100 pushState calls :/
+        // 页面离开确认
+        // 更新 state
+        let nextAction = 'PUSH';
+        let nextLocation = getNextLocation(to, state);
+
+        function retry() {
+            push(to, state);
+        }
+        if (allowTx(nextAction, nextLocation, retry)) {
+            let [historyState, url] = getHistoryStateAndUrl(nextLocation, index + 1);
+            // TODO: Support forced reloading
+            // try...catch because iOS limits us to 100 pushState calls :/
+            try {
+                globalHistory.pushState(historyState, '', url);
+            } catch (error) {
+                // They are going to lose state here, but there is no real
+                // way to warn them about it since the page will refresh...
+                window.location.assign(url);
+            }
+            applyTx(nextAction);
+        }
+    }
+
+    function go(n) {
+        globalHistory.go(n);
+    }
+
+    function block() {
+
+    }
+
+    function replace(to, state) {
+        let nextAction = 'REPLACE';
+        let nextLocation = getNextLocation(to, state);
+
+        function retry() {
+            replace(to, state);
+        }
+        if (allowTx(nextAction, nextLocation, retry)) {
+            let [historyState, url] = getHistoryStateAndUrl(nextLocation, index);
+            // TODO: Support forced reloading
+            globalHistory.replaceState(historyState, '', url);
+            applyTx(nextAction);
+        }
+    }
+    var history = {
+        get action() {
+            return action;
+        },
+        get location() {
+            return location;
+        },
+        listen(listener) {
+            console.log(1)
+            listeners.push(listener);
+            //监听函数会返回一个取消监听的函数
+            return function() {
+                listeners = listeners.filter(item => item !== listener);
+            }
+        },
+        createHref,
+        replace,
+        push,
+        block
     }
 
     return history;

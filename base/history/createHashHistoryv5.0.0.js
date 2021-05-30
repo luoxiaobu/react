@@ -1,9 +1,9 @@
-export function createBrowserHistory(options = {}) {
+export function createHashHistory(options = {}) {
     let { window = document.defaultView } = options;
     let globalHistory = window.history;
 
     function getIndexAndLocation() {
-        let { pathname, search, hash } = window.location;
+        let { pathname = '/', search = '', hash = '' } = parsePath(window.location.hash.substr(1));
         let state = globalHistory.state || {};
         return [
             state.idx,
@@ -27,7 +27,6 @@ export function createBrowserHistory(options = {}) {
             let [nextIndex, nextLocation] = getIndexAndLocation();
             if (blockers.length) {
                 if (nextIndex != null) {
-                    // delta 的值有意思
                     let delta = index - nextIndex;
                     if (delta) {
                         // Revert the POP
@@ -45,8 +44,8 @@ export function createBrowserHistory(options = {}) {
                     // this location, so we can't effectively block the navigation.
                     warning(false,
                         // TODO: Write up a doc that explains our blocking strategy in
-                        // detail and link to it here so people can understand better what
-                        // is going on and how to avoid it.
+                        // detail and link to it here so people can understand better
+                        // what is going on and how to avoid it.
                         `You are trying to block a POP navigation to a location that was not ` +
                         `created by the history library. The block will fail silently in ` +
                         `production, but in general you should do all navigation with the ` +
@@ -58,8 +57,16 @@ export function createBrowserHistory(options = {}) {
             }
         }
     }
-    // 对 history 变化的响应，history.go back ......
     window.addEventListener(PopStateEventType, handlePop);
+    // popstate does not fire on hashchange in IE 11 and old (trident) Edge
+    // https://developer.mozilla.org/de/docs/Web/API/Window/popstate_event
+    window.addEventListener(HashChangeEventType, () => {
+        let [, nextLocation] = getIndexAndLocation();
+        // Ignore extraneous hashchange events.
+        if (createPath(nextLocation) !== createPath(location)) {
+            handlePop();
+        }
+    });
     let action = Action.Pop;
     let [index, location] = getIndexAndLocation();
     let listeners = createEvents();
@@ -69,8 +76,19 @@ export function createBrowserHistory(options = {}) {
         globalHistory.replaceState(Object.assign(Object.assign({}, globalHistory.state), { idx: index }), '');
     }
 
+    function getBaseHref() {
+        let base = document.querySelector('base');
+        let href = '';
+        if (base && base.getAttribute('href')) {
+            let url = window.location.href;
+            let hashIndex = url.indexOf('#');
+            href = hashIndex === -1 ? url : url.slice(0, hashIndex);
+        }
+        return href;
+    }
+
     function createHref(to) {
-        return typeof to === 'string' ? to : createPath(to);
+        return getBaseHref() + '#' + (typeof to === 'string' ? to : createPath(to));
     }
 
     function getNextLocation(to, state = null) {
@@ -86,15 +104,14 @@ export function createBrowserHistory(options = {}) {
             createHref(nextLocation)
         ];
     }
-    // 确认是否离开路由
+
     function allowTx(action, location, retry) {
         return (!blockers.length || (blockers.call({ action, location, retry }), false));
     }
-    // 去到新的页面
+
     function applyTx(nextAction) {
         action = nextAction;
         [index, location] = getIndexAndLocation();
-        // 调用listener 去更新state 从而更新组件
         listeners.call({ action, location });
     }
 
@@ -105,6 +122,7 @@ export function createBrowserHistory(options = {}) {
         function retry() {
             push(to, state);
         }
+        warning(nextLocation.pathname.charAt(0) === '/', `Relative pathnames are not supported in hash history.push(${JSON.stringify(to)})`);
         if (allowTx(nextAction, nextLocation, retry)) {
             let [historyState, url] = getHistoryStateAndUrl(nextLocation, index + 1);
             // TODO: Support forced reloading
@@ -127,6 +145,7 @@ export function createBrowserHistory(options = {}) {
         function retry() {
             replace(to, state);
         }
+        warning(nextLocation.pathname.charAt(0) === '/', `Relative pathnames are not supported in hash history.replace(${JSON.stringify(to)})`);
         if (allowTx(nextAction, nextLocation, retry)) {
             let [historyState, url] = getHistoryStateAndUrl(nextLocation, index);
             // TODO: Support forced reloading

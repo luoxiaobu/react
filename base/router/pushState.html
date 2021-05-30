@@ -19,11 +19,9 @@
         })
 
         window.onpopstate = function(event) {
-            //调用history.pushState()或者history.replaceState()不会触发popstate事件. 
-            // popstate事件只会在浏览器某些行为下触发, 
-            // 比如点击后退、前进按钮(或者在JavaScript中调用history.back()、history.forward()、history.go()方法)，此外，a 标签的锚点也会触发该事件.
-
-            // 浏览器行为
+            // 当用户浏览会话历史时活动历史条目发生变化时，会触发 Window 界面的 popstate 事件。
+            // 当调用 history.pushState()或者history.replaceState()不会触发popstate事件. 
+            // popstate事件只会在浏览器某些行为下触发, 比如点击后退、前进按钮(或者在JavaScript中调用history.back()、history.forward()、history.go()方法)，此外，a 标签的锚点也会触发该事件.
             console.log('popstate， render');
         };
         window.onpushstate = function() {
@@ -61,12 +59,9 @@
     <div id="root"></div>
     <div onclick="goA()">去/a</div>
     <div onclick="goB()">去/b</div>
+    <div id="root"></div>
+    <a href="#/a">去/a</a>
+    <a href="#/b">去/b</a>
 </body>
 
 </html>
-
-<!--
-    hashchange hash 变化时触发，
-    它暴露了很多有用的方法和属性，允许你在用户浏览历史中向前和向后跳转，
-    同时，从HTML5开始——提供了对history栈中内容的操作。
--->

@@ -14,15 +14,10 @@ const DARK = 'dark'
 
 //函数组件
 function Content2(props) {
-    let a = <ThemeContext.Consumer>
-    {props =>(<div style={{ height: '100px', color: props.background}}>
-        内容2
-    </div>)}
-</ThemeContext.Consumer>
-    console.log(a)
-    return(
+
+    return (
         <ThemeContext.Consumer>
-            {props =>(<div style={{ height: '100px', color: props.background}}>
+            {props => (<div style={{ height: '100px', color: props.background }}>
                 内容2
             </div>)}
         </ThemeContext.Consumer>
@@ -60,7 +55,7 @@ class Header extends React.Component {
 class Main extends React.Component {
     static contextType = ThemeContext;
     render() {
-        return (<div style={{ height: '100px', color: this.context.background}}>
+        return (<div style={{ height: '100px', color: this.context.background }}>
             内容
         </div>)
     }
