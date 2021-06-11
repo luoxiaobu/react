@@ -11,7 +11,8 @@ export {
     Route,
     Router,
     Switch,
-    RouterContext
+    RouterContext,
+    Redirect
 }
 from "../react-router";
 
