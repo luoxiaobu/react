@@ -8,12 +8,12 @@
 
 
 export {
-    Redirect,
     Route,
     Router,
-    Switch
+    Switch,
+    RouterContext
 }
-from "react-router";
+from "../react-router";
 
 export { default as BrowserRouter }
 from './BrowserRouter.js';

@@ -9,7 +9,7 @@ class Router extends React.Component {
             location: props.history.location
         }
     // 当历史记录变化的时候 执行setState 让组件重新渲染
-        this.unlisten = this.props.history.listen(({ location }) => {
+        this.unlisten = this.props.history.listen((location) => {
             this.setState({ location })
         })
     }
