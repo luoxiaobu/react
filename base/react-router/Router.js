@@ -8,15 +8,40 @@ class Router extends React.Component {
         this.state = {
             location: props.history.location
         }
-    // 当历史记录变化的时候 执行setState 让组件重新渲染
-        this.unlisten = this.props.history.listen((location) => {
-            this.setState({ location })
-        })
+        // 当历史记录变化的时候 执行setState 让组件重新渲染
+
+        // This is a bit of a hack. We have to start listening for location
+        // changes here in the constructor in case there are any <Redirect>s
+        // on the initial render. If there are, they will replace/push when
+        // they mount and since cDM fires in children before parents, we may
+        // get a new location before the <Router> is mounted.
+        this._isMounted = false;
+        this._pendingLocation = null;
+
+        // 为什么要保证 挂载了才执行？ 保证代码执行顺序？
+        if (!props.staticContext) {
+            this.unlisten = props.history.listen(location => {
+                if (this._isMounted) {
+                    this.setState({ location });
+                } else {
+                    this._pendingLocation = location;
+                }
+            });
+        }
+    }
+    componentDidMount() {
+        this._isMounted = true;
+
+        if (this._pendingLocation) {
+            this.setState({ location: this._pendingLocation });
+        }
     }
     componentWillUnmount() {
         // 取消订阅监听
         if (this.unlisten) {
             this.unlisten();
+            this._isMounted = false;
+            this._pendingLocation = null;
         }
     }
     render() {

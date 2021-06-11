@@ -18,7 +18,7 @@ class Route extends React.Component {
                             return children
                         } else if (component) {
                             return React.createElement(component, props)
-                        } else if (render) {
+                        } else if (render) { // 用于告诉组件此处需要渲染什么
                             render(props)
                         }
                         return null;
