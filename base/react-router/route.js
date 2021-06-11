@@ -7,9 +7,8 @@ class Route extends React.Component {
             {
                 context => {
                     const location = this.props.location || context.location;
-                    const { history } = context;
                     let { component, computedMatch, render, children } = this.props;
-                    let match = matchPath(location.pathname, this.props)
+                    let match = computedMatch? computedMatch:matchPath(location.pathname, this.props)
                     let props = { ...context, location, match }
                     if (match) {
                         if (children) {
