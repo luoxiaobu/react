@@ -58,6 +58,8 @@ export function createPath({ pathname = '/', search = '', hash = '' }) {
     return pathname + search + hash;
 }
 
+
+
 export function createBrowserHistory(props) {
 
     function getIndexAndLocation() {
@@ -74,12 +76,16 @@ export function createBrowserHistory(props) {
         ];
     }
 
-    function createHref(to) {
-        return typeof to === 'string' ? to : createPath(to);
+    function getNextLocation(to, state = null) {
+        return {
+            state,
+            ...location,
+            ...(typeof to === 'string' ? parsePath(to) : to)
+        }
     }
 
-    function getNextLocation(to, state = null) {
-        return Object.assign({}, location, (typeof to === 'string' ? parsePath(to) : to), { state });
+    function createHref(to) {
+        return typeof to === 'string' ? to : createPath(to);
     }
 
     function getHistoryStateAndUrl(nextLocation, index) {
@@ -208,6 +214,14 @@ export function createHashHistory(props) {
             hash,
         }]
     }
+
+    function getNextLocation(to, state = null) {
+        return {
+            state,
+            ...location,
+            ...(typeof to === 'string' ? parsePath(to) : to)
+        }
+    }
     // 当用户浏览会话历史时活动历史条目发生变化时，会触发 Window 界面的 popstate 事件。
     // 当调用 history.pushState()或者history.replaceState()不会触发popstate事件. 
     window.addEventListener('popstate', () => {
@@ -246,10 +260,6 @@ export function createHashHistory(props) {
     // 生成URL
     function createHref(to) {
         return getBaseHref() + '#' + (typeof to === 'string' ? to : createPath(to));
-    }
-
-    function getNextLocation(to, state = null) {
-        return Object.assign({}, location, (typeof to === 'string' ? parsePath(to) : to), { state });
     }
 
     function getHistoryStateAndUrl(nextLocation, index) {

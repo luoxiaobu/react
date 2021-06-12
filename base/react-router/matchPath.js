@@ -44,7 +44,6 @@ function matchPath(pathname, options = {}) {
     if (typeof options === "string" || Array.isArray(options)) {
         options = { path: options };
     }
-
     const { path, exact = false, strict = false, sensitive = false } = options;
     var paths = [].concat(path)
     return paths.reduce((matched, path) => {

@@ -18,7 +18,7 @@ class Switch extends React.Component {
                                 element = child
                                 // Redirect组件 的路径来自 from, 匹配成功后 Redirect 会处理路径到 to 的处理
                                 const path = child.props.path || child.props.from;
-                                match = matchPath(location.pathname, path)
+                                match = matchPath(location.pathname, { ...child.props, path })
                             }
                         });
                         return match ? React.cloneElement(element, { location, computedMatch: match }) : null;
