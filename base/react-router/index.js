@@ -9,3 +9,6 @@ from './RouterContext';
 
 export { default as Redirect }
 from './Redirect';
+
+export { default as matchPath }
+from './matchPath'

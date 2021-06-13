@@ -1,6 +1,9 @@
 import React from "react";
 import { RouterContext} from "../react-router";
-
+import {
+    resolveToLocation,
+    normalizeToLocation
+  } from "./utils/locationUtils.js";
 // export default function Link(props) {
 
 //     return (
@@ -21,7 +24,13 @@ const Link = React.forwardRef(({ to, ...rest }, forwardedRef) => {
         { context => {
             // 简单模范了源码部分实现
             const { history } = context;
-            const href = to
+            // need creact createHref
+            const location = normalizeToLocation(
+              resolveToLocation(to, context.location),
+              context.location
+            );
+  
+            const href = location ? history.createHref(location) : "";
             const props = { ...rest, href };
             const navigate = () => {
                 // 

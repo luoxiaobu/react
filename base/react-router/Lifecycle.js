@@ -4,7 +4,6 @@ class Lifecycle extends React.Component {
 
     componentDidMount() {
         if (this.props.onMount) {
-            console.log('123')
             this.props.onMount.call(this, this)
         }
     }
