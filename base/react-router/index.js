@@ -12,3 +12,6 @@ from './Redirect';
 
 export { default as matchPath }
 from './matchPath'
+
+export { default as withRouter }
+from './withRouter'

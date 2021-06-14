@@ -12,7 +12,8 @@ export {
     Router,
     Switch,
     RouterContext,
-    Redirect
+    Redirect,
+    withRouter
 }
 from "../react-router";
 
