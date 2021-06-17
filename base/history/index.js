@@ -34,6 +34,40 @@
     replace: ƒ replace(path, state)
  */
 
+
+
+//?????? 此处还有疑惑
+// https://developer.mozilla.org/zh-CN/docs/Web/API/Window/beforeunload_event
+function promptBeforeUnload(event) {
+    // Cancel the event.
+    event.preventDefault();
+    // Chrome (and legacy IE) requires returnValue to be set.
+    event.returnValue = '';
+}
+
+function getConfirmation(message) {
+    return window.confirm(message);
+}
+
+function createEvents() {
+    let handlers = [];
+
+    return {
+        get length() {
+            return handlers.length;
+        },
+        push(fn) {
+            handlers.push(fn);
+            return function () {
+                handlers = handlers.filter(handler => handler !== fn);
+            };
+        },
+        call(arg) {
+            // 一个页面有一个弹窗不好么？
+            return handlers.map(fn => fn && fn(arg));
+        }
+    };
+}
 export function parsePath(path) {
     let partialPath = {};
     if (path) {
@@ -64,7 +98,7 @@ export function createBrowserHistory(props) {
 
     function getIndexAndLocation() {
         let { pathname, search, hash } = window.location;
-        let state = globalHistory.state || {};
+        let state = globalHistory.state || { idx: null };
         return [
             state.idx,
             {
@@ -90,32 +124,58 @@ export function createBrowserHistory(props) {
 
     function getHistoryStateAndUrl(nextLocation, index) {
         return [{
-                usr: nextLocation.state,
-                idx: index
-            },
-            createHref(nextLocation)
+            usr: nextLocation.state,
+            idx: index
+        },
+        createHref(nextLocation)
         ];
     }
     // window.history 上扩展包装
     var globalHistory = window.history;
-    let listeners = [];
+    let listeners = createEvents();
+    let blockers = createEvents();
     let action = 'POP';
     let [index, location] = getIndexAndLocation();
+    // 初始化 历史栈
+    if (index == null) {
+        index = 0;
+        globalHistory.replaceState(Object.assign(Object.assign({}, globalHistory.state), { idx: index }), '');
+    }
     // 确认是否离开路由
     function allowTx(action, location, retry) {
-        return true
+        if (!blockers.length) {
+            return true;
+        }
+        let [result] = blockers.call(location, action, retry)
+        if (typeof result === 'string') {
+            // getUserConfirmation 如果由外部提供就更好了可以实现自己的弹窗
+            // if (typeof getUserConfirmation && typeof getUserConfirmation === 'function') {
+            //     return getUserConfirmation(result);
+            // } else {
+            return getConfirmation(result);
+            // }
+        } else {
+            return result
+        }
     }
     // 去到新的页面
     function applyTx(nextAction) {
         action = nextAction;
         [index, location] = getIndexAndLocation();
         // 调用listener 去更新state 从而更新组件
-        listeners.forEach(listener => listener(location, action));
+        listeners.call(location, action);
     }
+
     // POP 造成 对 history 变化的响应，history.go back ......
     window.addEventListener('popstate', () => {
         let nextAction = 'POP'
-        applyTx(nextAction);
+        let [nextIndex, nextLocation] = getIndexAndLocation();
+        if (allowTx(nextAction, nextLocation)) {
+            let delta = index - nextIndex;
+            if (delta) {
+                applyTx(nextAction);
+            }
+        }
     });
 
     function push(to, state) {
@@ -164,7 +224,6 @@ export function createBrowserHistory(props) {
     function replace(to, state) {
         let nextAction = 'REPLACE';
         let nextLocation = getNextLocation(to, state);
-
         function retry() {
             replace(to, state);
         }
@@ -185,17 +244,27 @@ export function createBrowserHistory(props) {
         go,
         goBack,
         goForward,
-        listen(listener) {
-            console.log(1)
-            listeners.push(listener);
-            //监听函数会返回一个取消监听的函数
-            return function() {
-                listeners = listeners.filter(item => item !== listener);
-            }
-        },
         push,
         replace,
-        createHref
+        createHref,
+        listen(listener) {
+            return listeners.push(listener);
+        },
+        block(blocker, getUserConfirmation) {
+            let unblock = blockers.push(blocker);
+            if (blockers.length === 1) {
+                window.addEventListener('beforeunload', promptBeforeUnload);
+            }
+            return function () {
+                unblock();
+                // Remove the beforeunload listener so the document may
+                // still be salvageable in the pagehide event.
+                // See https://html.spec.whatwg.org/#unloading-documents
+                if (!blockers.length) {
+                    window.removeEventListener('beforeunload', promptBeforeUnload);
+                }
+            };
+        }
     }
 
     return history;
@@ -207,14 +276,14 @@ export function createHashHistory(props) {
 
     function getIndexAndLocation() {
         let { pathname = '/', hash = '', search = '' } = parsePath(window.location.hash.substr(1))
-        let state = globalHistory.state || {};
+        let state = globalHistory.state || { idx: null };
         return [state.idx, {
             pathname,
             search,
             hash,
+            state: state.usr || null
         }]
     }
-
     function getNextLocation(to, state = null) {
         return {
             state,
@@ -226,7 +295,10 @@ export function createHashHistory(props) {
     // 当调用 history.pushState()或者history.replaceState()不会触发popstate事件. 
     window.addEventListener('popstate', () => {
         let nextAction = 'POP'
-        applyTx(nextAction);
+        let [, nextLocation] = getIndexAndLocation();
+        if (allowTx(nextAction, nextLocation)) {
+            applyTx(nextAction);
+        }
     });
     // popstate does not fire on hashchange in IE 11 and old (trident) Edge
     // https://developer.mozilla.org/de/docs/Web/API/Window/popstate_event
@@ -237,15 +309,23 @@ export function createHashHistory(props) {
         // Ignore extraneous hashchange events.
         if (createPath(nextLocation) !== createPath(location)) {
             let nextAction = 'POP'
-            applyTx(nextAction);
+            if (allowTx(nextAction, nextLocation)) {
+                applyTx(nextAction);
+            }
         }
     });
 
     // window.history 上扩展包装
     var globalHistory = window.history;
-    let listeners = [];
+    let listeners = createEvents();
+    let blockers = createEvents();
     let action = 'POP';
     let [index, location] = getIndexAndLocation();
+    // 初始化 历史栈
+    if (index == null) {
+        index = 0;
+        globalHistory.replaceState(Object.assign(Object.assign({}, globalHistory.state), { idx: index }), '');
+    }
     // ???
     function getBaseHref() {
         let base = document.querySelector('base');
@@ -264,23 +344,35 @@ export function createHashHistory(props) {
 
     function getHistoryStateAndUrl(nextLocation, index) {
         return [{
-                usr: nextLocation.state,
-                idx: index
-            },
-            createHref(nextLocation)
+            usr: nextLocation.state,
+            idx: index
+        },
+        createHref(nextLocation)
         ];
     }
-
     // 确认是否离开路由
     function allowTx(action, location, retry) {
-        return true
+        if (!blockers.length) {
+            return true;
+        }
+        let [result] = blockers.call(location, action, retry)
+        if (typeof result === 'string') {
+            // getUserConfirmation 如果由外部提供就更好了可以实现自己的弹窗
+            // if (typeof getUserConfirmation && typeof getUserConfirmation === 'function') {
+            //     return getUserConfirmation(result);
+            // } else {
+            return getConfirmation(result);
+            // }
+        } else {
+            return result
+        }
     }
     // 去到新的页面
     function applyTx(nextAction) {
         action = nextAction;
         [index, location] = getIndexAndLocation();
         // 调用listener 去更新state 从而更新组件
-        listeners.forEach(listener => listener(location, action));
+        listeners.call(location, action);
     }
 
     function push(to, state) {
@@ -314,14 +406,9 @@ export function createHashHistory(props) {
         globalHistory.go(n);
     }
 
-    function block() {
-
-    }
-
     function replace(to, state) {
         let nextAction = 'REPLACE';
         let nextLocation = getNextLocation(to, state);
-
         function retry() {
             replace(to, state);
         }
@@ -339,18 +426,27 @@ export function createHashHistory(props) {
         get location() {
             return location;
         },
-        listen(listener) {
-            console.log(1)
-            listeners.push(listener);
-            //监听函数会返回一个取消监听的函数
-            return function() {
-                listeners = listeners.filter(item => item !== listener);
-            }
-        },
         createHref,
         replace,
         push,
-        block
+        listen(listener) {
+            return listeners.push(listener);
+        },
+        block(blocker, getUserConfirmation) {
+            let unblock = blockers.push(blocker);
+            if (blockers.length === 1) {
+                window.addEventListener('beforeunload', promptBeforeUnload);
+            }
+            return function () {
+                unblock();
+                // Remove the beforeunload listener so the document may
+                // still be salvageable in the pagehide event.
+                // See https://html.spec.whatwg.org/#unloading-documents
+                if (!blockers.length) {
+                    window.removeEventListener('beforeunload', promptBeforeUnload);
+                }
+            };
+        }
     }
 
     return history;

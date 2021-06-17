@@ -13,7 +13,8 @@ export {
     Switch,
     RouterContext,
     Redirect,
-    withRouter
+    withRouter,
+    Prompt
 }
 from "../react-router";
 

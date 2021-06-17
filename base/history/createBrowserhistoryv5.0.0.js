@@ -1,3 +1,23 @@
+// function createEvents<F extends Function>(): Events<F> {
+//     let handlers: F[] = [];
+
+//     return {
+//       get length() {
+//         return handlers.length;
+//       },
+//       push(fn: F) {
+//         handlers.push(fn);
+//         return function() {
+//           handlers = handlers.filter(handler => handler !== fn);
+//         };
+//       },
+//       call(arg) {
+//         handlers.forEach(fn => fn && fn(arg));
+//       }
+//     };
+//   }
+
+
 export function createBrowserHistory(options = {}) {
     let { window = document.defaultView } = options;
     let globalHistory = window.history;

@@ -15,3 +15,6 @@ from './matchPath'
 
 export { default as withRouter }
 from './withRouter'
+
+export { default as Prompt }
+from './Prompt'

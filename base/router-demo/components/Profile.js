@@ -3,6 +3,7 @@ import { removeItem } from '../utils/storage'
 export default class Profile extends React.Component {
     handleClick = ()=>{
         removeItem('login');
+        console.log('out')
         if(this.props.history){
             this.props.history.push('/');
         }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from '../utils/user';
-import { Link } from '../react-router-dom';
+import { Link } from './react-router-dom';
 export default class extends React.Component {
     state = { users: [] }
     componentDidMount() {
