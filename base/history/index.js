@@ -155,7 +155,7 @@ export function createBrowserHistory(props) {
             return getConfirmation(result);
             // }
         } else {
-            return result
+            return !result
         }
     }
     // 去到新的页面
@@ -364,7 +364,7 @@ export function createHashHistory(props) {
             return getConfirmation(result);
             // }
         } else {
-            return result
+            return !result
         }
     }
     // 去到新的页面
