@@ -7,16 +7,7 @@
  */
 
 
-export {
-    Route,
-    Router,
-    Switch,
-    RouterContext,
-    Redirect,
-    withRouter,
-    Prompt
-}
-from "../react-router";
+export * from '../react-router';
 
 export { default as BrowserRouter }
 from './BrowserRouter.js';
