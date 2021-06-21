@@ -19,8 +19,7 @@ export function useHistory() {
 }
 
 export function useRouteMatch(path) {
- 
   const location = useLocation();
-  const match = useContext(RouterContext).match;
+  const match = React.useContext(RouterContext).match;
   return path ? matchPath(location.pathname, path) : match;
 }
