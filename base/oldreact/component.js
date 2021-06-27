@@ -77,6 +77,7 @@ class Updater {
         // state 在这个循环中重来没有变过，所以非函数用的一直是state
         pendingState.forEach((partialState) => {
             if (isFunction(partialState)) {
+                // 是一种覆盖拷贝
                 nextState = {...nextState, ...partialState(nextState) }
             } else {
                 nextState = {...nextState, ...partialState }

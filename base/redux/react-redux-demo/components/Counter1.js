@@ -1,6 +1,6 @@
 import React from "react";
 import actions from '../store/actions/counter';
-import { connect } from 'react-redux';
+import { connect } from '../react-redux';
 
 class Counter extends React.Component {
 
@@ -16,6 +16,6 @@ class Counter extends React.Component {
 
 }
 
-let mapStateToProps = (state) => state.counter
+const mapStateToProps = (state) => state.counter
 
 export default connect(mapStateToProps, actions)(Counter)

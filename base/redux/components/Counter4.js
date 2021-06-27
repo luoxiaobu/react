@@ -1,31 +1,21 @@
 import React from "react";
-import store from "../store";
 import actions from '../store/actions/counter4';
-import { bindActionCreators } from 'redux'
+import { connect } from '../react-redux'
 
 
-let bindActions = bindActionCreators(actions, store.dispatch)
-export default class extends React.Component {
-
-    state = store.getState().counter4
-
-    componentDidMount() {
-        this.unSubscribe = store.subscribe(() => {
-            console.log('counter4')
-            this.setState(store.getState().counter4)
-        })
-    }
-    componentWillUnmount() {
-        this.unSubscribe()
-    }
+class Counter4 extends React.Component {
     render() {
         return (
             <div>
-                <p>{this.state.value}</p>
-                <button onClick={bindActions.increment4}>+</button>
-                <button onClick={bindActions.decrement4}>-</button>
+                <p>{this.props.value}</p>
+                <button onClick={this.props.increment4}>+</button>
+                <button onClick={this.props.decrement4}>-</button>
             </div>
         )
     }
 
 }
+
+const mapStateToProps = state => state.counter4;
+
+export default connect(mapStateToProps, actions)(Counter4)

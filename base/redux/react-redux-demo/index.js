@@ -2,7 +2,7 @@ import react from 'react';
 
 import ReactDom from 'react-dom';
 //Redux 官方提供的 React 绑定库。 具有高效且灵活的特性。
-import { Provider } from 'react-redux';
+import { Provider } from './react-redux';
 
 import store from './store'
 
